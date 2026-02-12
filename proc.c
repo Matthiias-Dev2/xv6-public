@@ -88,7 +88,9 @@ allocproc(void)
 found:
   p->state = EMBRYO;
   p->pid = nextpid++;
-  p->priority = 1;
+
+  // initialize default priority for a brand new process
+  p->priority = 1;   // (or whatever default your assignment says)
 
   release(&ptable.lock);
 
@@ -497,6 +499,28 @@ kill(int pid)
   release(&ptable.lock);
   return -1;
 }
+
+// Set process priority for pid. Returns 0 on success, -1 on failure.
+int
+setpriority(int pid, int prio)
+{
+  struct proc *p;
+
+  if(prio < 0 || prio > 2)
+    return -1;
+
+  acquire(&ptable.lock);
+  for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
+    if(p->state != UNUSED && p->pid == pid){
+      p->priority = prio;
+      release(&ptable.lock);
+      return 0;
+    }
+  }
+  release(&ptable.lock);
+  return -1;
+}
+
 
 //PAGEBREAK: 36
 // Print a process listing to console.  For debugging.
