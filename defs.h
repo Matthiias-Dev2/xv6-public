@@ -154,6 +154,7 @@ int             argptr(int, char**, int);
 int             argstr(int, char**);
 int             fetchint(uint, int*);
 int             fetchstr(uint, char**);
+int             sys_setpriority(void);
 void            syscall(void);
 
 // timer.c

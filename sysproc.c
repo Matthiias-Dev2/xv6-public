@@ -89,3 +89,36 @@ sys_uptime(void)
   release(&tickslock);
   return xticks;
 }
+
+int
+sys_setpriority(void)
+{
+  int pid, prio;
+  struct proc *p;
+
+  // parse args
+  if(argint(0, &pid) < 0)
+    return -1;
+  if(argint(1, &prio) < 0)
+    return -1;
+
+  // validate priority range
+  if(prio < 0 || prio > 2)
+    return -1;
+
+  // find pid among non-UNUSED processes and set priority under lock
+  acquire(&ptable.lock);
+  for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
+    if(p->state == UNUSED)
+      continue;
+    if(p->pid == pid){
+      p->priority = prio;
+      release(&ptable.lock);
+      return 0;
+    }
+  }
+  release(&ptable.lock);
+
+  // pid not found
+  return -1;
+}

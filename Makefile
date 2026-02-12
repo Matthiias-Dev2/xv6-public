@@ -90,6 +90,12 @@ ifneq ($(shell $(CC) -dumpspecs 2>/dev/null | grep -e '[^f]nopie'),)
 CFLAGS += -fno-pie -nopie
 endif
 
+sh.o: sh.c
+	$(CC) $(CFLAGS) -Wno-error=infinite-recursion -c -o sh.o sh.c
+
+mp.o: mp.c
+	$(CC) $(CFLAGS) -Wno-error=array-bounds -c -o mp.o mp.c
+
 xv6.img: bootblock kernel
 	dd if=/dev/zero of=xv6.img count=10000
 	dd if=bootblock of=xv6.img conv=notrunc
@@ -181,6 +187,7 @@ UPROGS=\
 	_usertests\
 	_wc\
 	_zombie\
+	_testprio\
 
 fs.img: mkfs README $(UPROGS)
 	./mkfs fs.img README $(UPROGS)
